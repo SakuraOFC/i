@@ -1,1 +1,1 @@
-bash <(curl -sSL https://raw.githubusercontent.com/The-DiosBot-MD/i/main/start.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/SakuraOFC/i/main/start.sh)
