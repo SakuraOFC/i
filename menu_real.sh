@@ -46,7 +46,7 @@ show_menu() {
     echo -e " ${CYAN}[${YELLOW}4${CYAN}]${NC} ${RED}🚪 Salir (Borrará todo)${NC}"
     echo ""
     echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -ne "${YELLOW}👉 Selecciona una opción [1-4]: ${NC}"
+    echo -ne "${YELLOW}👉 Selecciona una opción [1-5]: ${NC}"
 }
 
 # Función para ejecutar script
