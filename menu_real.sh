@@ -42,8 +42,8 @@ show_menu() {
     echo -e " ${CYAN}[${YELLOW}1${CYAN}]${NC} ${GREEN}🔵 BluePin - Instalar y configurar${NC}"
     echo -e " ${CYAN}[${YELLOW}2${CYAN}]${NC} ${MAGENTA}📊 Dash - Instalar y configurar${NC}"
     echo -e " ${CYAN}[${YELLOW}3${CYAN}]${NC} ${BLUE}🖥️  Panel - Instalar y configurar${NC}"
-    echo -e " ${CYAN}[${YELLOW}1${CYAN}]${NC} ${GREEN}💕 Paymenter - Instalar y configurar${NC}"
-    echo -e " ${CYAN}[${YELLOW}4${CYAN}]${NC} ${RED}🚪 Salir (Borrará todo)${NC}"
+    echo -e " ${CYAN}[${YELLOW}4${CYAN}]${NC} ${GREEN}💕 Paymenter - Instalar y configurar${NC}"
+    echo -e " ${CYAN}[${YELLOW}5${CYAN}]${NC} ${RED}🚪 Salir (Borrará todo)${NC}"
     echo ""
     echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -ne "${YELLOW}👉 Selecciona una opción [1-5]: ${NC}"
@@ -81,7 +81,7 @@ run_script() {
 
 # Descargar todos los scripts al inicio
 echo -e "${BLUE}📥 Preparando entorno...${NC}"
-for script in bluepin.sh dash.sh panel.sh; do
+for script in bluepin.sh dash.sh panel.sh paymenter.sh; do
     curl -sSL -o "$TEMP_DIR/$script" "https://raw.githubusercontent.com/The-DiosBot-MD/i/main/$script"
     chmod +x "$TEMP_DIR/$script" 2>/dev/null
 done
@@ -104,13 +104,13 @@ while true; do
             run_script "panel.sh"
             ;;
         4)
-            run_script "paymer.sh"
+            run_script "paymenter.sh"
             ;;
         5)
             cleanup
             ;;
         *)
-            echo -e "\n${RED}❌ Opción inválida. Usa 1, 2, 3 ,etc.${NC}"
+            echo -e "\n${RED}❌ Opción inválida. Usa 1, 2, 3, 4 o 5${NC}"
             sleep 2
             ;;
     esac
