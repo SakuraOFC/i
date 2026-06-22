@@ -1,1 +1,1 @@
-bash <(curl -sSL https://raw.githubusercontent.com/SakuraOFC/i/main/install.sh)
+bash <(curl -sSL https://raw.githubusercontent.com/SakuraOFC/i/main/start.sh)
