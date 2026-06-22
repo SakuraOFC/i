@@ -10,18 +10,15 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# ============================================
-# CONFIGURACIÓN
-# ============================================
-REPO_URL="https://raw.githubusercontent.com/The-DiosBot-MD/i/main"
+# Configuración
+REPO_USER="Sakura0FC"
+REPO_NAME="i"
+BRANCH="main"
+RAW_URL="https://raw.githubusercontent.com/$REPO_USER/$REPO_NAME/$BRANCH"
 TEMP_DIR="/tmp/the-diosbot-$$"
 mkdir -p "$TEMP_DIR"
 
-# ============================================
-# FUNCIONES
-# ============================================
-
-# Limpiar al salir
+# Función para limpiar al salir
 cleanup() {
     echo -e "\n${YELLOW}🧹 Limpiando archivos temporales...${NC}"
     rm -rf "$TEMP_DIR"
@@ -34,11 +31,17 @@ trap cleanup EXIT INT TERM
 # Descargar todos los scripts
 download_all_scripts() {
     echo -e "${BLUE}📥 Descargando scripts...${NC}"
-    for script in bluepin.sh dash.sh panel.sh paymenter.sh; do
+    local scripts=("bluepin.sh" "dash.sh" "panel.sh" "paymenter.sh")
+    
+    for script in "${scripts[@]}"; do
         echo -ne "  Descargando $script... "
-        if curl -sSL -o "$TEMP_DIR/$script" "$REPO_URL/$script" 2>/dev/null; then
-            chmod +x "$TEMP_DIR/$script"
-            echo -e "${GREEN}✓${NC}"
+        if curl -sSL -o "$TEMP_DIR/$script" "$RAW_URL/$script" 2>/dev/null; then
+            if [ -s "$TEMP_DIR/$script" ]; then
+                chmod +x "$TEMP_DIR/$script"
+                echo -e "${GREEN}✓${NC}"
+            else
+                echo -e "${RED}✗ Archivo vacío${NC}"
+            fi
         else
             echo -e "${RED}✗ Falló${NC}"
         fi
@@ -52,8 +55,8 @@ show_menu() {
     clear
     echo -e "${CYAN}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║     The DiosBot-MD - Script Manager                     ║"
-    echo "║          (Modo Auto-Destructivo)                        ║"
+    echo "║         Ceresita - Script Manager                        ║"
+    echo "║          (Modo Auto-Destructivo)                         ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
     echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -83,18 +86,30 @@ run_script() {
         echo -e "\n${GREEN}✅ Script finalizado${NC}"
     else
         echo -e "${RED}❌ Error: No se encontró $script_name${NC}"
+        echo -e "${YELLOW}💡 El script no se descargó correctamente. Verifica que exista en el repositorio.${NC}"
     fi
     
     echo ""
     echo -ne "${BLUE}📌 Presiona [ENTER] para continuar...${NC}"
-    read -r input
+    read -r
 }
 
 # ============================================
 # PROGRAMA PRINCIPAL
 # ============================================
 
-# Descargar scripts primero
+# Verificar que podemos conectar a GitHub
+echo -e "${BLUE}🔍 Verificando conexión a GitHub...${NC}"
+if curl -sSL -I "$RAW_URL/menu.sh" >/dev/null 2>&1; then
+    echo -e "${GREEN}✅ Conexión exitosa${NC}\n"
+else
+    echo -e "${RED}❌ No se pudo conectar a GitHub. Verifica tu conexión a internet.${NC}"
+    echo -e "${YELLOW}La URL es: $RAW_URL/menu.sh${NC}"
+    sleep 3
+    exit 1
+fi
+
+# Descargar scripts
 download_all_scripts
 
 # Bucle principal
