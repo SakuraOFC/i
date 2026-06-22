@@ -36,6 +36,14 @@ press_enter() {
     read -p "Presione Enter para continuar..."
 }
 
+# Función para validar dominio (sin http:// o https://)
+validate_domain() {
+    local domain=$1
+    # Eliminar http:// o https:// si el usuario los incluyó
+    domain=$(echo "$domain" | sed -e 's|^https\?://||')
+    echo "$domain"
+}
+
 clear
 print_message "=== INSTALADOR DE PAYMENTER ==="
 print_message "Este script instalará y configurará Paymenter en tu servidor"
@@ -130,10 +138,17 @@ php artisan db:seed --class=CustomPropertySeeder
 
 # Paso 9: Configurar dominio
 print_message "Configuración del dominio"
-print_warning "Ingrese el dominio completo (ejemplo: https://quintillisas.com)"
-read -p "Dominio: " DOMAIN
+print_warning "Ingrese el dominio SIN http:// o https://"
+print_warning "Ejemplo: quintillisas.com (NO https://quintillisas.com)"
+read -p "Dominio: " DOMAIN_INPUT
+DOMAIN=$(validate_domain "$DOMAIN_INPUT")
+print_message "Dominio registrado: $DOMAIN"
 
-print_message "Inicializando Paymenter..."
+# Actualizar APP_URL en .env
+print_message "Actualizando APP_URL en .env..."
+sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|g" .env
+
+print_message "Inicializando Paymenter con el dominio: $DOMAIN"
 php artisan app:init
 
 # Paso 10: Crear usuario administrador
@@ -171,19 +186,46 @@ print_message "Instalando Certbot para SSL..."
 apt update -y
 apt install certbot python3-certbot-nginx -y
 
-# Configurar SSL
+# Paso 14: Configurar SSL
 print_message "Configuración SSL"
-if ask_yes_no "¿Desea usar el dominio $DOMAIN para SSL o desea cambiarlo?"; then
+print_warning "Dominio actual: $DOMAIN"
+if ask_yes_no "¿Desea usar el dominio $DOMAIN o desea editarlo antes de continuar?"; then
     print_message "Usando dominio: $DOMAIN"
 else
-    read -p "Ingrese el nuevo dominio (ejemplo: example.com): " DOMAIN
+    read -p "Ingrese el nuevo dominio (ejemplo: example.com): " DOMAIN_INPUT
+    DOMAIN=$(validate_domain "$DOMAIN_INPUT")
+    print_message "Dominio actualizado a: $DOMAIN"
+    # Actualizar APP_URL con el nuevo dominio
+    sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|g" .env
+fi
+
+# Confirmar dominio
+print_warning "Dominio a usar para SSL y Nginx: $DOMAIN"
+if ask_yes_no "¿Es correcto este dominio?"; then
+    print_message "Continuando con el dominio: $DOMAIN"
+else
+    read -p "Ingrese el dominio correcto (ejemplo: example.com): " DOMAIN_INPUT
+    DOMAIN=$(validate_domain "$DOMAIN_INPUT")
+    print_message "Dominio actualizado a: $DOMAIN"
+    # Actualizar APP_URL con el nuevo dominio
+    sed -i "s|APP_URL=.*|APP_URL=https://$DOMAIN|g" .env
 fi
 
 print_message "Ejecutando Certbot para obtener certificado SSL..."
+print_message "Usando dominio: $DOMAIN (SIN http:// o https://)"
 certbot certonly --nginx -d $DOMAIN
 
-# Paso 14: Configurar Nginx
-print_message "Configurando Nginx..."
+# Verificar si Certbot tuvo éxito
+if [ $? -eq 0 ]; then
+    print_message "Certificado SSL generado exitosamente para $DOMAIN"
+else
+    print_error "Error al generar el certificado SSL"
+    print_warning "Verifique que el dominio $DOMAIN apunte a este servidor"
+    print_warning "Puede intentar ejecutar manualmente: certbot certonly --nginx -d $DOMAIN"
+fi
+
+# Paso 15: Configurar Nginx
+print_message "Configurando Nginx con el dominio: $DOMAIN"
 cat > /etc/nginx/sites-available/paymenter.conf <<EOF
 server {
     listen 80;
@@ -226,11 +268,11 @@ sudo ln -sf /etc/nginx/sites-available/paymenter.conf /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo systemctl restart nginx
 
-# Paso 15: Configurar permisos
+# Paso 16: Configurar permisos
 print_message "Configurando permisos finales..."
 chown -R www-data:www-data /var/www/paymenter/*
 
-# Paso 16: Mostrar información final
+# Paso 17: Mostrar información final
 clear
 print_message "=== INSTALACIÓN COMPLETADA ==="
 print_message "Paymenter ha sido instalado exitosamente!"
@@ -243,5 +285,7 @@ print_warning "IMPORTANTE:"
 echo "1. Si tuvo problemas con el certificado SSL, ejecute: sudo certbot --nginx -d $DOMAIN"
 echo "2. Para ver los logs: sudo journalctl -u paymenter.service -f"
 echo "3. Para reiniciar el servicio: sudo systemctl restart paymenter.service"
+echo "4. Asegúrese de que el dominio $DOMAIN apunte a este servidor"
+echo "5. El archivo .env tiene APP_URL configurado como: https://$DOMAIN"
 echo ""
 print_message "¡Gracias por usar este instalador!"
