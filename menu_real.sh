@@ -42,6 +42,7 @@ show_menu() {
     echo -e " ${CYAN}[${YELLOW}1${CYAN}]${NC} ${GREEN}🔵 BluePin - Instalar y configurar${NC}"
     echo -e " ${CYAN}[${YELLOW}2${CYAN}]${NC} ${MAGENTA}📊 Dash - Instalar y configurar${NC}"
     echo -e " ${CYAN}[${YELLOW}3${CYAN}]${NC} ${BLUE}🖥️  Panel - Instalar y configurar${NC}"
+    echo -e " ${CYAN}[${YELLOW}1${CYAN}]${NC} ${GREEN}💕 Paymenter - Instalar y configurar${NC}"
     echo -e " ${CYAN}[${YELLOW}4${CYAN}]${NC} ${RED}🚪 Salir (Borrará todo)${NC}"
     echo ""
     echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
