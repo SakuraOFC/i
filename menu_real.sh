@@ -103,10 +103,13 @@ while true; do
             run_script "panel.sh"
             ;;
         4)
+            run_script "paymer.sh"
+            ;;
+        5)
             cleanup
             ;;
         *)
-            echo -e "\n${RED}❌ Opción inválida. Usa 1, 2, 3 o 4${NC}"
+            echo -e "\n${RED}❌ Opción inválida. Usa 1, 2, 3 ,etc.${NC}"
             sleep 2
             ;;
     esac
